@@ -13,6 +13,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Setup Git config
+      run: |
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+
     # Step untuk memastikan folder weekly-log ada
     - name: Ensure weekly-log directory exists
       run: mkdir -p weekly-log
