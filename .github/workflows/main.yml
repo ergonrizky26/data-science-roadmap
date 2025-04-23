@@ -1,0 +1,48 @@
+name: Generate Weekly Log
+
+on:
+  schedule:
+    - cron: '0 15 * * 3'  # Setiap hari Rabu jam 22:00 WIB
+  workflow_dispatch:
+
+jobs:
+  create-log:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Git config
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+      - name: Generate weekly log file
+        run: |
+          WEEK_NUM=$(date +%U)
+          DATE=$(date '+%Y-%m-%d')
+          FILE_PATH="weekly-log/week-${WEEK_NUM}.md"
+          if [ ! -f "$FILE_PATH" ]; then
+            echo -e "## Week ${WEEK_NUM} - ${DATE}\n\n### ✅ Goals\n- \n\n### 📘 Resources\n- \n\n### 🧠 What I Learned\n- \n\n### 🚧 Challenges\n- \n\n### 📍 Next Week Goals\n- " > "$FILE_PATH"
+            git add "$FILE_PATH"
+            git commit -m "Add auto-generated log for Week ${WEEK_NUM}"
+            git push
+          else
+            echo "Log for Week ${WEEK_NUM} already exists."
+
+      - name: Send notification email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ Weekly Log Week-${{ github.run_number }} Created"
+          body: |
+            Weekly log untuk minggu ini telah otomatis dibuat.
+            Silakan cek file terbaru di folder `weekly-log/` di repositori kamu.
+
+            Keep pushing your Data Science journey! 💪📊
+          to: ${{ secrets.EMAIL_RECEIVER }}
+          from: ${{ secrets.EMAIL_USERNAME }}
