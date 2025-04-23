@@ -1,0 +1,6 @@
+# Latihan SQL
+
+- SELECT
+- JOIN
+- GROUP BY
+- WINDOW FUNCTION
